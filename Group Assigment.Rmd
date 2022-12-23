@@ -1,0 +1,59 @@
+---
+title: "SQB7007 Group Assignment"
+author: "Marc Phoon"
+date: '`r Sys.Date()`'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load data
+
+```{r load}
+setwd("~/Library/CloudStorage/OneDrive-Personal/Masters in Statistics/SQB7007/Data")
+library(haven)
+dat <- read_sav("1546826-US_DatCEV3_09052018_Data_Download_10.7.20.sav")
+
+var_description <- list()
+for (col in colnames(dat)){
+  var_description <- append(var_description,attr(dat[[col]], which="label"))
+}
+```
+
+## EDA
+
+```{r eda}
+table(dat$cqHidCondition)
+table(dat$cqhidS5)
+```
+
+## Variable Selection
+
+```{r var}
+
+dat_sub <- dat[,c("cqP7_1","cqP8_1", "cqPT19_1", "cqPT19_2", "cqHidCondition", "cqhidS5", 
+                  "cqhidAge", "cqHid2")]
+dat_sub$cqHidCondition<-as.factor(dat_sub$cqHidCondition)
+dat_sub$cqhidS5<-as.factor(dat_sub$cqhidS5)
+dat_sub$cqhidAge<-as.factor(dat_sub$cqhidAge)
+dat_sub$cqHid2<-as.factor(dat_sub$cqHid2)
+```
+
+## Testing for Equality of Covariance Matrices
+
+```{r equal_cov}
+library(heplots)
+boxm_treatment <- boxM(cbind(cqP7_1,cqP8_1, cqPT19_1, cqPT19_2)~cqHidCondition, data=dat_sub)
+summary(boxm_treatment)
+
+boxm_educ <- boxM(cbind(cqP7_1,cqP8_1, cqPT19_1, cqPT19_2)~cqhidS5, data=dat_sub)
+summary(boxm_educ)
+
+boxm_age <- boxM(cbind(cqP7_1,cqP8_1, cqPT19_1, cqPT19_2)~cqhidAge, data=dat_sub)
+summary(boxm_age)
+
+boxm_gender <- boxM(cbind(cqP7_1,cqP8_1, cqPT19_1, cqPT19_2)~cqHid2, data=dat_sub)
+summary(boxm_gender)
+```
